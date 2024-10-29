@@ -1,0 +1,122 @@
+Index: devtools_options.yaml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/devtools_options.yaml b/devtools_options.yaml
+new file mode 100644
+--- /dev/null	(revision 0e00011e92cd724eae3f0285aac56fe1834be969)
++++ b/devtools_options.yaml	(revision 0e00011e92cd724eae3f0285aac56fe1834be969)
+@@ -0,0 +1,1 @@
++extensions:
+Index: lib/Features/Explore/presentation/widgets/add_appointment_widget.dart
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lib/Features/Explore/presentation/widgets/add_appointment_widget.dart b/lib/Features/Explore/presentation/widgets/add_appointment_widget.dart
+--- a/lib/Features/Explore/presentation/widgets/add_appointment_widget.dart	(revision 0b40e6f31d12c391938083627b3fd5f47047a91e)
++++ b/lib/Features/Explore/presentation/widgets/add_appointment_widget.dart	(revision 0e00011e92cd724eae3f0285aac56fe1834be969)
+@@ -58,6 +58,7 @@
+       selectedTime.hour,
+       selectedTime.minute,
+     );
++    log(selectedTime.hour.toString());
+     String formattedDate = DateFormat("yyyy-MM-ddTHH:mm:ss.SSS'Z'")
+         .format(combinedDateTime.toUtc());
+     setState(() {
+Index: lib/Features/Profile/data/data_sources/profile_remote_data.dart
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lib/Features/Profile/data/data_sources/profile_remote_data.dart b/lib/Features/Profile/data/data_sources/profile_remote_data.dart
+--- a/lib/Features/Profile/data/data_sources/profile_remote_data.dart	(revision 0b40e6f31d12c391938083627b3fd5f47047a91e)
++++ b/lib/Features/Profile/data/data_sources/profile_remote_data.dart	(revision 0e00011e92cd724eae3f0285aac56fe1834be969)
+@@ -13,7 +13,7 @@
+   Future<List<UserAppointment>> getAppointments(String userId) async {
+     final response = await APIHelper.getScheduleAppointment(userId);
+     List<UserAppointment> list =
+-        (response.data).map((value) => UserAppointment.fromJson(value)).toList();
++        (response).map((value) => UserAppointment.fromJson(value)).toList();
+     return list;
+   }
+ }
+Index: lib/Features/Profile/presentation/pages/profile_screen.dart
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lib/Features/Profile/presentation/pages/profile_screen.dart b/lib/Features/Profile/presentation/pages/profile_screen.dart
+--- a/lib/Features/Profile/presentation/pages/profile_screen.dart	(revision 0b40e6f31d12c391938083627b3fd5f47047a91e)
++++ b/lib/Features/Profile/presentation/pages/profile_screen.dart	(revision 0e00011e92cd724eae3f0285aac56fe1834be969)
+@@ -158,10 +158,10 @@
+                                           .toString());
+                                 },
+                                 separatorBuilder: (context, index) => Divider(),
+-                                itemCount: 10,
++                                itemCount: state.appointmnets.length,
+                               );
+                             }
+-                            return CircularProgressIndicator();
++                            return CireProgressIndecatorWidget();
+                           },
+                         );
+                       }, listener: (context, state) {
+Index: lib/Features/Profile/presentation/widgets/appoints_widget.dart
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lib/Features/Profile/presentation/widgets/appoints_widget.dart b/lib/Features/Profile/presentation/widgets/appoints_widget.dart
+--- a/lib/Features/Profile/presentation/widgets/appoints_widget.dart	(revision 0b40e6f31d12c391938083627b3fd5f47047a91e)
++++ b/lib/Features/Profile/presentation/widgets/appoints_widget.dart	(revision 0e00011e92cd724eae3f0285aac56fe1834be969)
+@@ -29,8 +29,9 @@
+           mainAxisAlignment: MainAxisAlignment.center,
+           children: [
+             TitlesTextWidget(
+-              label:  DateConverter.getDateTimeWithMonth(dateTime),
+-              fontSize: 12,
++              label:"Your next Appointment in ${DateConverter.getDateTimeWithMonth(dateTime)}",
++              color: Colors.blue,
++              fontSize: 16,
+             ),
+           ],
+         ),
+Index: lib/core/network/api_helper.dart
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lib/core/network/api_helper.dart b/lib/core/network/api_helper.dart
+--- a/lib/core/network/api_helper.dart	(revision 0b40e6f31d12c391938083627b3fd5f47047a91e)
++++ b/lib/core/network/api_helper.dart	(revision 0e00011e92cd724eae3f0285aac56fe1834be969)
+@@ -1,3 +1,5 @@
++import 'dart:developer';
++
+ import 'package:dio/dio.dart';
+ import 'package:flutter/cupertino.dart';
+ import 'package:realestate/core/network/api_constatn.dart';
+@@ -57,13 +59,19 @@
+       throw Exception('Failed to fetch data: $e');
+     }
+   }
+-  static Future<Response> getScheduleAppointment( String userId) async {
++  static Future<List<dynamic>> getScheduleAppointment( String userId) async {
+     try {
+       final response = await _dio.request(
+           'https://realestate20240404164946.azurewebsites.net/api/ScheduleAppointment/user/$userId',
+           options: Options(method: "GET"));
+-            pritnt(response.data.toString());
+-      return response;
++            log(response.data.toString());
++            if(response.statusCode==200){
++              List<dynamic>responseData=response.data;
++              return responseData;
++            }else{
++              throw Exception('failed to fetch data ${response.statusCode}');
++            }
++      return response.data;
+     } catch (e) {
+       // Handle error
+       log(e.toString());
